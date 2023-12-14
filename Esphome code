@@ -1,31 +1,32 @@
+#work in progress still, jsut wanted to share my take on it!
 esphome:
-  name: gsi8
+  name: esphome-web-cec8ec
+  friendly_name: ctc
 
 esp32:
   board: esp32dev
   framework:
     type: arduino
+#this is optional, but nice to have
+web_server:
+  port: 80
 
 # Enable logging
 logger:
 
 # Enable Home Assistant API
 api:
-
+  encryption:
+    key: ""
 ota:
-
-
+Set to your own
 wifi:
-  ssid: "###"
-  password: "####"
-
-
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ssid: "xxx"
+  password: "xxxxxxxxx"
+# Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Esphome-Web-064D30"
-    password: "KWW0DapBzwsM"
-
-captive_portal:
+    password: "topsecret"
 
 uart:
   id: mod_bus
@@ -36,8 +37,8 @@ uart:
   stop_bits: 1
 
 modbus:
-  flow_control_pin: 5
-  id: modbus1
+ flow_control_pin: 5
+ id: modbus1
 
 modbus_controller:
   - id: epever
@@ -46,346 +47,187 @@ modbus_controller:
     modbus_id: modbus1
     setup_priority: -10
 
+sensor:
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      register_type: read
+      name: "Faktisk inomhustemperatur"
+      id: inomhus_temp
+      accuracy_decimals: 1
+      address: 0x0261
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+      state_class: "measurement"
+      value_type: S_WORD
+      filters:
+      - multiply: 0.1
+
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      name: "Utetemperatur"
+      id: utomhus_temp
+      register_type: read
+      address: 0x025E
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+      state_class: "measurement"
+      accuracy_decimals: 1
+      value_type: S_WORD
+      filters:
+        - multiply: 0.1
+  
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      name: "Övre tank, temperatur"
+      id: upper_tank_temp
+      register_type: read
+      address: 0x0259
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+      state_class: "measurement"
+      accuracy_decimals: 2
+      value_type: S_WORD
+      filters:
+        - multiply: 0.1
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      name: "Lägre tank, temperatur"
+      id: lower_tank_temp
+      register_type: read
+      address: 0x025B
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+      state_class: "measurement"
+      accuracy_decimals: 2
+      value_type: S_WORD
+      filters:
+        - multiply: 0.1
+  
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      name: "VP ut"
+      id: con_out
+      register_type: read
+      address: 0x027A
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+      state_class: "measurement"
+      accuracy_decimals: 2
+      value_type: S_WORD
+      filters:
+        - multiply: 0.1
+
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      name: "VP in"
+      id: con_in
+      register_type: read
+      address: 0x0278
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+      state_class: "measurement"
+      accuracy_decimals: 2
+      value_type: S_WORD
+      filters:
+      - multiply: 0.1
+
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      name: "Laddpump"
+      id: ladd_pump
+      register_type: read
+      address: 0x0288
+      ##address: 0x00CE
+      unit_of_measurement: "%"
+      accuracy_decimals: 2
+      value_type: U_WORD
+      filters:
+      - multiply: 0.1
+
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      name: "Extra varmvatten, satt väre"
+      id: ex_tid
+      register_type: read
+      address: 0x00CE
+      ##address: 0x00CE
+      unit_of_measurement: "h"
+      accuracy_decimals: 1
+      value_type: U_WORD
+      filters:
+      - multiply: 0.5
+
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      register_type: read
+      name: "Värme framledning"
+      id: heating_cir1
+      accuracy_decimals: 2
+      address: 0x0000027A
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+      state_class: "measurement"
+      value_type: S_WORD
+      filters:
+      - multiply: 0.1
+
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      register_type: read
+      name: "Värme retur"
+      id: heating_cir2
+      accuracy_decimals: 2
+      address: 0x0000025F
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+      state_class: "measurement"
+      value_type: S_WORD
+      filters:
+      - multiply: 0.1
+
+    - platform: modbus_controller
+      modbus_controller_id: epever
+      register_type: read
+      name: "Satt inomhustemperatur"
+      id: temp_satt
+      accuracy_decimals: 2
+      address: 0x00CB
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+      state_class: "measurement"
+      value_type: S_WORD
+      filters:
+      - multiply: 0.1
+
 select:
   - platform: modbus_controller
-    name: "Heating mode"
-    address: 0x0000F066
-    value_type: U_WORD
+    name: "Varmvatten Läge"
+    id: heating_mode
+    modbus_controller_id: epever
+    address: 0x00CF
+    value_type: S_WORD
     optionsmap:
-      "Auto": 0
-      "On": 1
-      "Off": 2
- 
-sensor:
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Roomtemp"
-    id: roomtemp
-    register_type: read
-    address: 0x0000F045
-    state_class: "measurement"
-    accuracy_decimals: 0
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1
+      "Ekonomi": 0
+      "Normal": 1
+      "Komfort": 2
 
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "214"
-    id: reg214
-    register_type: read
-    address: 0x000000D6
-    state_class: "measurement"
-    accuracy_decimals: 0
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Adjustment"
-    id: adjustment
-    register_type: read
-    address: 0x0000F04D
-    state_class: "measurement"
-    accuracy_decimals: 0
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Outdoor temperature"
-    id: outdoor_temp
-    register_type: read
-    address: 0x025E
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: U_WORD
-    filters:
-      - multiply: 0.1
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Upper tank temperature"
-    id: upper_tank_temp
-    register_type: read
-    address: 0x0259
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Middle tank temperature"
-    id: middle_tank_temp
-    register_type: read
-    address: 0x025A
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Lower tank temperature"
-    id: lower_tank_temp
-    register_type: read
-    address: 0x025B
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Primary Flow Temp"
-    id: pri_flo_temp
-    register_type: read
-    address: 0x025F
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1     
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "L1"
-    id: l1
-    register_type: read
-    address: 0x0264
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1  
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "L2"
-    id: l2
-    register_type: read
-    address: 0x0265
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1  
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "L3"
-    id: l3
-    register_type: read
-    address: 0x0266
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1  
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Brine ind"
-    id: brine_ind
-    register_type: read
-    address: 0x0000F287
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: U_WORD
-    filters:
-      - multiply: 0.1
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Brine ud"
-    id: brine_ud
-    register_type: read
-    address: 0x0000F291
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: U_WORD
-    filters:
-      - multiply: 0.1
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Radiator retur"
-    id: radiator_retur
-    register_type: read
-    address: 0x027A
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Radiator fremløb"
-    id: radiator_frem
-    register_type: read
-    address: 0x0278
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Condenser in"
-    id: con_in
-    register_type: read
-    address: 0x025D
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Condenser out"
-    id: con_out
-    register_type: read
-    address: 0x025C
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    state_class: "measurement"
-    accuracy_decimals: 2
-    value_type: S_WORD
-    filters:
-      - multiply: 0.1      
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Heating status"
-    id: heating_status
-    register_type: read
-    address: 0x0000F066
-    state_class: "measurement"
-    value_type: U_WORD
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Ekstra varmt vand"
-    id: ekstra_varmt_vand
-    register_type: read
-    address: 0x0000F03F
-    state_class: "measurement"
-    value_type: U_WORD
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Software version"
-    id: software_version
-    register_type: read
-    address: 0x0000F2CD
-    state_class: "measurement"
-    value_type: U_WORD
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    name: "Heatpump typen"
-    id: heat_pump_type
-    register_type: read
-    address: 0x0000F32E
-    state_class: "measurement"
-    value_type: U_WORD 
-    
 number:
   - platform: modbus_controller
     modbus_controller_id: epever
-    id: ekstra_varmt_vandr
-    name: "Ekstra varmt vand"
-    address: 0x0000F03F
+    id: extra_varm_vatten
+    name: "Extra varmvatten timer"
+    address: 0x000000CE
     value_type: U_WORD
     min_value: 0
     max_value: 20
     step: 0.5
     mode: box
-    lambda: "return  x * 1.; "
+    lambda: "return  x * .5; "
     write_lambda: |-
-      ESP_LOGD("main","Modbus Number incoming value = %f",x);
-      uint16_t b_capacity = x  ;
-      payload.push_back(b_capacity);
-      return x * 1.0 ;
+      esphome::modbus_controller::ModbusController *controller = id(epever);
+      std::vector<uint16_t> hotwater_data = {uint16_t((x))};
+      esphome::modbus_controller::ModbusCommandItem set_hotwater_command = esphome::modbus_controller::ModbusCommandItem::create_write_multiple_command(controller, 0x00DB, 0x0001, hotwater_data);
+      controller->queue_command(set_hotwater_command);
+      return x * 2 ;
     ## multiply is ignored because lamdba is used
-    multiply: 1.0
-
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    id: inclination_number
-    name: "Kurvehældning"
-    address: 0x0000F049
-    value_type: U_WORD
-    min_value: 25
-    max_value: 85
-    mode: box
-    step: 1
-    lambda: "return  x * 0.1; "
-    write_lambda: |-
-      ESP_LOGD("main","Modbus Number incoming value = %f",x);
-      uint16_t c_capacity = x * 10 ;
-      payload.push_back(c_capacity);
-      return x * 1.0 ;
-    ## multiply is ignored because lamdba is used
-    multiply: 1
-    
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    id: forskydning
-    name: "Forskydning"
-    address: 0x0000F04D
-    value_type: S_WORD
-    min_value: -20
-    max_value: 20
-    mode: box
-    step: 1
-    lambda: "return  x * 0.1; "
-    write_lambda: |-
-      ESP_LOGD("main","Modbus Number incoming value = %f",x);
-      uint16_t c_capacity = x * 10 ;
-      payload.push_back(c_capacity);
-      return x * 1.0 ;
-    ## multiply is ignored because lamdba is used
-    multiply: 1
-
-binary_sensor:
-  - platform: modbus_controller
-    modbus_controller_id: epever
-    id: brine_pump
-    name: "Brine pumpe"
-    register_type: read
-    address: 0x028A
-    bitmask: 0x30 #(bit 3)
+    #multiply: 1.0
