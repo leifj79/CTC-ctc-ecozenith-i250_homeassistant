@@ -1,9 +1,8 @@
-# CTC-GSi-8---Homeassistant
-For connection between CTC GSi and Homeassistant (testet with GSi 8 and GSi 16)It probably works on EcoHeat 400 series as well.
+# ctc-ecozenith-i250
+For connection between CTC ecozenith i250, the old version and Homeassistant.
 I haven't found all the modbus registers yet from the lists in the pdf files
 
 ![Skærmbillede 2022-11-07 151830](https://user-images.githubusercontent.com/71944008/200332690-383c7424-a406-4df4-b542-bcc13bf7fdfd.png)
-
 
 RJ12 cable cut in half an connected to NodeMCU ESP32
 
