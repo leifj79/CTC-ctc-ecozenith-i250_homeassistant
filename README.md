@@ -2,7 +2,10 @@
 For connection between CTC ecozenith i250, the old version and Homeassistant.
 I haven't found all the modbus registers yet from the lists in the pdf files
 
-![Skærmbillede 2022-11-07 151830](https://user-images.githubusercontent.com/71944008/200332690-383c7424-a406-4df4-b542-bcc13bf7fdfd.png)
+![image](https://github.com/leifj79/CTC-ctc-ecozenith-i250_homeassistant/assets/114435387/2170cf4e-4d2d-4aed-a394-7b6177da7b1e)
+![image](https://github.com/leifj79/CTC-ctc-ecozenith-i250_homeassistant/assets/114435387/2a2c21b4-a268-42bf-8dfc-1c49a3441f63)
+![image](https://github.com/leifj79/CTC-ctc-ecozenith-i250_homeassistant/assets/114435387/edbbcbb0-4b9d-4508-a19c-8c2c4237d2d5)
+
 
 RJ12 cable cut in half an connected to NodeMCU ESP32
 
