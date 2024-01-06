@@ -1,7 +1,7 @@
 substitutions:
   name: "esphome-web-cec8ec"
   friendly_name: "ctc"
-  key_api1: "the apikey"
+  key_api1: "apikey"
 
 esphome:
   name: ${name}
@@ -12,12 +12,13 @@ esp32:
   framework:
     type: arduino
 
-#not needed, but nice to have when testing
+#Not needed, but nice to have :)
 web_server:
   port: 80
 
 # Enable logging
 logger:
+  level: debug
 
 # Enable Home Assistant API
 api:
@@ -142,7 +143,6 @@ sensor:
       id: ladd_pump
       register_type: read
       address: 0x0288
-      ##address: 0x00CE
       unit_of_measurement: "%"
       accuracy_decimals: 2
       value_type: U_WORD
@@ -155,7 +155,6 @@ sensor:
       id: ex_tid
       register_type: read
       address: 0x00CE
-      ##address: 0x00CE
       unit_of_measurement: "h"
       accuracy_decimals: 1
       value_type: U_WORD
@@ -169,20 +168,6 @@ sensor:
       id: heating_cir1
       accuracy_decimals: 2
       address: 0x0000027A
-      unit_of_measurement: "°C"
-      device_class: "temperature"
-      state_class: "measurement"
-      value_type: S_WORD
-      filters:
-      - multiply: 0.1
-
-    - platform: modbus_controller
-      modbus_controller_id: epever
-      register_type: read
-      name: "Värme retur"
-      id: heating_cir2
-      accuracy_decimals: 2
-      address: 0x0000025F
       unit_of_measurement: "°C"
       device_class: "temperature"
       state_class: "measurement"
@@ -237,4 +222,17 @@ number:
     mode: box
     step: 0.1
     multiply: 10
-    
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: up_tank_imm_kw
+    name: "Övre tank kW"
+    address: 0x00EE
+    value_type: S_WORD
+    unit_of_measurement: "kW"
+    device_class: "POWER"
+    min_value: 0
+    max_value: 9
+    mode: slider
+    step: 0.1
+    multiply: 10
